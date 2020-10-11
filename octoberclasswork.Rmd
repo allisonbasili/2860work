@@ -1,0 +1,69 @@
+---
+title: "OctoberClasswork"
+author: "Allison Basili"
+date: "10/11/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+7.3.4 #2 
+Explore the distribution of price. Do you discover anything unusual or surprising? (Hint: Carefully think about the binwidth and make sure you try a wide range of values.)
+
+```{r}
+library(tidyverse)
+glimpse(diamonds)
+library(nycflights13)
+view(flights)
+```
+
+
+7.3.4 #2 
+#Explore the distribution of price. Do you discover anything unusual or surprising? (Hint: Carefully think about the binwidth and make sure you try a wide range of values.)
+```{r}
+ggplot(diamonds) + 
+  geom_histogram(mapping = aes(x = price), binwidth = 20) +
+  theme_bw()
+```
+I can tell that the price is strongly right-skewed with consistant fluctation, meaning there are many more lower priced diamonds than there are in the higher price range. In fact, I see that there is a huge number of diamonds around the 400-800 dollar range. This makes sense to me because higher priced items are often rare items. The demand for less expensive jewelry is also a factor, among others I may not think of. One thing that stands out to me is the lack in diamonds that fall around the 1.5k price range. This could represent a distinct difference between common diamonds and expensive ones.
+
+#Use what you’ve learned to improve the visualisation of the departure times of cancelled vs. non-cancelled flights.
+```{r}
+nycflights13::flights %>% 
+  mutate(
+    cancelled = is.na(dep_time),
+    sched_hour = sched_dep_time %/% 100,
+    sched_min = sched_dep_time %% 100,
+    sched_dep_time = sched_hour + sched_min / 60
+  ) %>% 
+  ggplot(mapping = aes(x = sched_dep_time)) +
+  geom_boxplot(mapping = aes(color = cancelled)) +
+  theme_bw()
+```
+#What variable in the diamonds dataset is most important for predicting the price of a diamond? How is that variable correlated with cut? Why does the combination of those two relationships lead to lower quality diamonds being more expensive?
+```{r}
+diamonds %>%
+  mutate(cut = as.numeric(cut),
+         color = as.numeric(color),
+         clarity = as.numeric(clarity)) %>%
+  select(price, everything()) %>%
+  cor()
+```
+
+  
+Carat is the most predictive/correlated variable.
+```{r}
+diamonds %>%
+  mutate(cut = as.numeric(cut),
+         color = as.numeric(color),
+         clarity = as.numeric(clarity)) 
+ggplot(data = diamonds) +
+  geom_boxplot(mapping = aes(x = reorder(cut, carat, FUN = median), y = carat, color = cut)) +
+  coord_flip() +
+  theme_classic()
+```
+  
+  The cut seems to be less ideal as the number of carats increases. This must be why a nicer cut seemed to lead to a less pricey diamond. It is not the actual cut that affects the price, but it is the correlation between how the carat affects the cut. This makes sense also because the carat is the more important variable when it comes to price. One reason I can think of that the carat affects the cut most likely because it is harder to get a very nice cut on a large carat diamond, as the cut must be more precise and is more visible, and because once you cut a diamond it becomes smaller.
+  
